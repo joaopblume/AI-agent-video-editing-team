@@ -1,24 +1,25 @@
 #!/usr/bin/env python3
 """
-Base Agent - Classe Abstrata para Arquitetura Padrão dos Agentes
+Base Agent - Abstract class used to standardize the architecture of all agents
 =================================================================
 
-Esta classe define a arquitetura obrigatória que todos os agentes devem seguir
-para funcionar no sistema de edição de vídeo com IA.
+This class defines the mandatory structure and methods that all agents must implement.
 
-RESPONSABILIDADES OBRIGATÓRIAS:
-- Estrutura de pastas padronizada
-- Sistema de relatórios JSON para o Coordinator
-- Feedback estruturado entre agentes
-- Carregamento de instruções do Coordinator
-- Salvamento de resultados e análises
+MANDATORY RESPONSIBILITIES:
+- Standardized folder structure
+- JSON reporting system for the Coordinator
+- Structured feedback between agents
+- Loading instructions from the Coordinator
+- Saving results and analyses
 
-AGENTES DO SISTEMA:
+AGENTS IN THE SYSTEM:
 - RICO: Video Chunking Specialist
+- FOSTER: Soundtrack Specialist
 - DAVID: Audio Cleaning Specialist  
 - SAIMON: Content Selection Specialist
 - CLOE: Dynamic Editing Specialist
 - SHEYLA: Quality Control Specialist
+- NIALL: Subtitle Specialist
 """
 
 import os
@@ -30,23 +31,23 @@ from typing import Dict, List, Any, Optional
 
 class BaseAgent(ABC):
     """
-    Classe abstrata que define a arquitetura padrão para todos os agentes.
-    
-    ESTRUTURA OBRIGATÓRIA:
-    =====================
-    
-    1. DIRETÓRIOS:
-       - processing/{agent_name}/     # Pasta principal do agente
-       - processing/chunks/           # Chunks de vídeo (Rico)
-       - processing/coordinator/      # Planos e relatórios do Coordinator
-    
-    2. ARQUIVOS OBRIGATÓRIOS:
-       - {agent_name}_analysis_*.json      # Análises detalhadas
-       - {agent_name}_results.json         # Resultados consolidados
-       - {agent_name}_feedback.json        # Feedback para Coordinator
-    
-    3. MÉTODOS OBRIGATÓRIOS:
-       - load_processing_plan()            # Carrega instruções do Coordinator
+    Abstract class for all agents in the video editing system.
+
+    MANDATORY STRUCTURE:
+    ====================
+
+    1. DIRECTORIES:
+       - processing/{agent_name}/     # Main folder for the agent
+       - processing/chunks/           # Video chunks (Rico)
+       - processing/coordinator/      # Plans and reports from the Coordinator
+
+    2. MANDATORY FILES:
+       - {agent_name}_analysis_*.json      # Detailed analyses
+       - {agent_name}_results.json         # Consolidated results
+       - {agent_name}_feedback.json        # Feedback for Coordinator
+
+    3. MANDATORY METHODS:
+       - load_processing_plan()            # Loads instructions from the Coordinator
        - execute()                         # Método principal de processamento
        - generate_feedback()               # Feedback para Coordinator
        - save_results()                    # Salva resultados finais
@@ -54,11 +55,11 @@ class BaseAgent(ABC):
     
     def __init__(self, agent_name: str, role: str):
         """
-        Inicializa agente com estrutura padrão.
+        Initializes the BaseAgent with the agent's name and role.
         
         Args:
-            agent_name: Nome do agente (RICO, DAVID, SAIMON, CLOE, SHEYLA)
-            role: Função do agente (ex: AUDIO_CLEANING_SPECIALIST)
+            agent_name: (RICO, DAVID, SAIMON, CLOE, SHEYLA)
+            role: (eg: AUDIO_CLEANING_SPECIALIST)
         """
         self.name = agent_name.upper()
         self.role = role.upper()
@@ -79,21 +80,20 @@ class BaseAgent(ABC):
         self.feedback_file = self.agent_dir / f'{self.name.lower()}_feedback.json'
         self.workflow_plan_file = self.coordinator_dir / 'workflow_plan.json'
         
-        print(f"🤖 {self.name} inicializado")
-        print(f"📋 Função: {self.role}")
-        print(f"📁 Diretório: {self.agent_dir}")
+        print(f"🤖 {self.name} initializing")
+        print(f"📋 Role: {self.role}")
     
     def load_processing_plan(self) -> Optional[Dict[str, Any]]:
         """
-        OBRIGATÓRIO: Carrega plano de processamento do Coordinator.
-        
+        Loads processing plan from the Coordinator.
+
         Returns:
             Dict com instruções do Coordinator ou None se não encontrado
         """
-        print(f"\n📋 {self.name}: Carregando plano de processamento...")
+        print(f"\n📋 {self.name}: Loading processing plan...")
         
         if not self.workflow_plan_file.exists():
-            print(f"❌ Plano não encontrado: {self.workflow_plan_file}")
+            print(f"Plan not found: {self.workflow_plan_file}")
             return None
         
         try:
@@ -102,43 +102,43 @@ class BaseAgent(ABC):
             
             # Verificar se este agente está na lista de agentes selecionados
             if self.name not in plan.get('selected_agents', []):
-                print(f"❌ {self.name} não foi selecionado para este workflow")
+                print(f"{self.name} was not selected for this plan.")
                 return None
-            
-            print(f"✅ Plano carregado - {self.name} selecionado para processamento")
+
+            print(f"Plan loaded - {self.name} selected for processing")
             return plan
             
         except Exception as e:
-            print(f"❌ Erro ao carregar plano: {e}")
+            print(f"Error loading plan: {e}")
             return None
     
     @abstractmethod
     def execute(self) -> bool:
         """
-        OBRIGATÓRIO: Método principal de execução do agente.
+        Main processing method for the agent.
         
-        Deve implementar:
-        1. Carregar plano do Coordinator
-        2. Processar conforme instruções
-        3. Salvar análises detalhadas
-        4. Gerar feedback para Coordinator
-        5. Salvar resultados finais
+        Must implements:
+        1. Load processing plan from the Coordinator
+        2. Process according to instructions
+        3. Save detailed analyses
+        4. Generate feedback for Coordinator
+        5. Save final results
         
         Returns:
-            bool: True se sucesso, False se falha
+            bool: True if processing was successful, False otherwise
         """
         pass
     
     def save_analysis(self, analysis_data: Dict[str, Any], item_name: str) -> str:
         """
-        PADRÃO: Salva análise detalhada de item específico.
-        
+        Saves detailed analysis for a specific item.
+
         Args:
-            analysis_data: Dados da análise
-            item_name: Nome do item analisado
-            
+            analysis_data: Analysis data
+            item_name: Name of the analyzed item
+
         Returns:
-            Caminho do arquivo salvo
+            Path to the saved file
         """
         analysis_file = self.agent_dir / f"{self.name.lower()}_analysis_{item_name}.json"
         
@@ -151,19 +151,19 @@ class BaseAgent(ABC):
         
         with open(analysis_file, 'w', encoding='utf-8') as f:
             json.dump(analysis_with_metadata, f, indent=2, ensure_ascii=False)
-        
-        print(f"   💾 Análise salva: {analysis_file.name}")
+
+        print(f"Saved Analysis: {analysis_file.name}")
         return str(analysis_file)
     
     def save_results(self, results: Dict[str, Any]) -> str:
         """
-        OBRIGATÓRIO: Salva resultados consolidados do agente.
-        
+        Saves consolidated results from the agent.
+
         Args:
-            results: Resultados do processamento
-            
+            results: Processing results
+
         Returns:
-            Caminho do arquivo de resultados
+            Path to the results file
         """
         results_with_metadata = {
             'agent': self.name,
@@ -175,8 +175,8 @@ class BaseAgent(ABC):
         
         with open(self.results_file, 'w', encoding='utf-8') as f:
             json.dump(results_with_metadata, f, indent=2, ensure_ascii=False)
-        
-        print(f"📄 Resultados salvos: {self.results_file}")
+
+        print(f"Saved Results: {self.results_file}")
         return str(self.results_file)
     
     def generate_feedback(self, 
@@ -186,17 +186,17 @@ class BaseAgent(ABC):
                          recommendations: List[str] = None,
                          metrics: Dict[str, Any] = None) -> str:
         """
-        OBRIGATÓRIO: Gera feedback estruturado para o Coordinator.
-        
+        Generates structured feedback for the Coordinator.
+
         Args:
-            success: Se o processamento foi bem-sucedido
-            decisions_made: Lista de decisões tomadas pelo agente
-            problems_found: Problemas encontrados durante processamento
-            recommendations: Recomendações para próximos agentes
-            metrics: Métricas de performance e confiança
-            
+            success: If the processing was successful
+            decisions_made: List of decisions made by the agent
+            problems_found: Problems found during processing
+            recommendations: Recommendations for next agents
+            metrics: Performance and confidence metrics
+
         Returns:
-            Caminho do arquivo de feedback
+            Path to the feedback file
         """
         feedback = {
             'agent': self.name,
@@ -218,19 +218,19 @@ class BaseAgent(ABC):
         
         with open(self.feedback_file, 'w', encoding='utf-8') as f:
             json.dump(feedback, f, indent=2, ensure_ascii=False)
-        
-        print(f"📊 Feedback gerado: {self.feedback_file}")
+
+        print(f"Generated Feedback: {self.feedback_file}")
         return str(self.feedback_file)
     
     def get_agent_instructions(self, processing_plan: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         """
-        UTILITÁRIO: Extrai instruções específicas para este agente.
-        
+        Extracts specific instructions for this agent.
+
         Args:
-            processing_plan: Plano completo do Coordinator
-            
+            processing_plan: Complete plan from the Coordinator
+
         Returns:
-            Instruções específicas do agente ou None
+            Specific instructions for the agent or None
         """
         return processing_plan['strategy']['agent_instructions'].get(self.name)
     
@@ -241,17 +241,17 @@ class BaseAgent(ABC):
                               confidence: float,
                               data_used: Dict[str, Any] = None) -> Dict[str, Any]:
         """
-        UTILITÁRIO: Cria registro estruturado de decisão.
+        Create a structured record of a decision made by the agent.
         
         Args:
-            decision_type: Tipo da decisão (ex: "audio_processing", "content_selection")
-            decision: Decisão tomada
-            reasoning: Justificativa da decisão
-            confidence: Nível de confiança (0.0 a 1.0)
-            data_used: Dados que influenciaram a decisão
-            
+            decision_type: Decision Type (ex: "audio_processing", "content_selection")
+            decision: Decision made
+            reasoning: Justification for the decision
+            confidence: Confidence level (0.0 to 1.0)
+            data_used: Data that influenced the decision
+
         Returns:
-            Registro estruturado da decisão
+            Structured record of the decision
         """
         return {
             'decision_type': decision_type,
@@ -264,12 +264,12 @@ class BaseAgent(ABC):
     
     def log_processing_step(self, step_name: str, status: str, details: str = ""):
         """
-        UTILITÁRIO: Log padronizado de etapas de processamento.
+        Standardized logging for processing steps.
         
         Args:
-            step_name: Nome da etapa
+            step_name: Name of the step
             status: Status (SUCCESS, ERROR, WARNING, INFO)
-            details: Detalhes adicionais
+            details: Additional details
         """
         status_icons = {
             'SUCCESS': '✅',
@@ -283,14 +283,14 @@ class BaseAgent(ABC):
 
 # Exemplo de constantes para padronização
 class AgentStatus:
-    """Constantes para status de agentes"""
+    """Agent status constants"""
     SUCCESS = "SUCCESS"
     ERROR = "ERROR"
     WARNING = "WARNING"
     INFO = "INFO"
 
 class DecisionTypes:
-    """Constantes para tipos de decisões"""
+    """Decision types constants"""
     AUDIO_PROCESSING = "audio_processing"
     CONTENT_SELECTION = "content_selection"
     VIDEO_ENHANCEMENT = "video_enhancement"

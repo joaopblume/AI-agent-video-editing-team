@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Agente Rico - Especialista em dividir vídeos em chunks
-Recebe instruções e cria chunks otimizados para processamento
+RICO Agent 
+Splits videos into smaller chunks for efficient processing
 """
 
 import os
@@ -13,27 +13,17 @@ import time
 from base_agent import BaseAgent, DecisionTypes, AgentStatus
 
 class AgenteRico(BaseAgent):
-    """
-    Agente Rico - Responsável por dividir vídeos em chunks
-    
-    MISSÃO: Receber vídeos e criar chunks menores para otimizar
-    o processamento pelos outros agentes do pipeline.
-    """
-    
+
     def __init__(self):
         super().__init__("RICO", "VIDEO_CHUNKING_SPECIALIST")
         
         # Configurações específicas do Rico  
-        self.default_chunk_duration = 120  # 2 minutos por chunk
-        self.default_overlap = 5  # 5 segundos de overlap
+        self.default_chunk_duration = 120  # 2 minutes for chunks
+        self.default_overlap = 5  # 5 seconds overlap
     
     def execute(self) -> bool:
-        """
-        OBRIGATÓRIO: Método principal de execução do Agent Rico.
-        Implementa o pipeline completo de chunking de vídeo.
-        """
         print(f"\n{'='*60}")
-        print(f"🎬📊 {self.name}: INICIANDO CHUNKING DE VÍDEO")
+        print(f"🎬📊 {self.name}: Initiating chunking video")
         print(f"{'='*60}")
         
         # Carregar plano do Coordinator
