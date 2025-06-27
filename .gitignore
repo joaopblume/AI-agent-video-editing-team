@@ -1,0 +1,9 @@
+*.mp4
+*/__pycache__/
+venv/
+CLAUDE.md
+*.json
+.env
+raw/*
+processing/*
+processed/*
