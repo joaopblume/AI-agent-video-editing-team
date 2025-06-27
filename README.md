@@ -67,14 +67,6 @@ Vídeo Final Editado
 
 ## Como Usar
 
-### Configuração Inicial
-```bash
-# Execute o script de configuração completa
-./local/quick_star.sh
-
-# Teste os componentes do sistema
-python local/test_system.py
-```
 
 ### Processamento de Vídeos
 ```bash
@@ -90,24 +82,5 @@ ls processed/
 
 ## Estrutura do Projeto
 
-```
-video-edit-team/
-├── raw/                  # Vídeos de entrada
-├── processed/            # Vídeos editados (saída)
-├── temp/                 # Arquivos temporários
-├── logs/                 # Logs do sistema
-├── config/               # Configurações
-├── agents/               # Código dos agentes especializados
-└── local/                # Scripts de desenvolvimento
-```
 
 ## Requisitos do Sistema
-
-- **WSL2 Ubuntu 22.04** (para desenvolvimento Windows)
-- **Docker e Docker Compose**
-- **Ollama** rodando localmente
-- **GPU AMD com ROCm** (opcional, para aceleração)
-
----
-
-*Este projeto representa o futuro da edição de vídeos: completamente automatizada, inteligente e eficiente.*
